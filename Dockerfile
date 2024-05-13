@@ -1,17 +1,22 @@
-# Use an appropriate base image for your web server
-FROM nginx:latest
+FROM ubuntu:latest
 
-# Copy your HTML, CSS, and JavaScript files to the appropriate directory in the container
-COPY index.html   /usr/share/nginx/html
+RUN apt update \
+    && apt install -y apache2 \
+                       php \
+                       libapache2-mod-php \
+                       php-mysql \
+    && apt clean
 
-COPY style.css /usr/share/nginx/html
+RUN apt install -y apache2-utils 
 
-COPY team.php /usr/share/nginx/html
+RUN apt clean 
 
-# Optionally, if your web application requires additional dependencies or configurations, you can perform those steps here
+COPY team.php /var/www/html/
 
-# Expose the port your web server will listen on
-EXPOSE 8080
+COPY index.html /var/www/html/
 
-# Define the command to start your web server
-CMD ["nginx", "-g", "daemon off;"]
+COPY style.css /var/www/html/
+
+EXPOSE 80
+
+CMD ["apache2ctl", "-D", "FOREGROUND"]
